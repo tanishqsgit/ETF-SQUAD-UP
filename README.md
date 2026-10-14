@@ -55,7 +55,7 @@ The card action is **View profile**. Squads, invitations, messaging, live presen
 | Vite                                  | 6.4.4          | Development and production builds                                     |
 | Tailwind CSS / Vite adapter           | 4.3.3          | Styling pipeline with custom theme/component CSS                      |
 | Zustand                               | 5.0.15         | Persisted theme and demo-session stores                               |
-| React Hot Toast                       | 2.6.0          | Registration/login feedback                                           |
+| React Hot Toast                       | 2.6.1          | Registration/login feedback                                           |
 | React Icons                           | 5.7.0          | Feather icons                                                         |
 | Vite PWA plugin                       | 1.3.0          | Manifest, Workbox generation and update hook                          |
 | Fontsource DM Sans / Barlow Condensed | 5.3.0          | Bundled font files                                                    |
