@@ -2,329 +2,187 @@
 
 **Find your squad. Dominate together.**
 
-A mobile-first project for India's competitive mobile gamers, starting with Free Fire and intended to expand to BGMI and CODM. The product aims to help players find teammates by tactical role and playing hours, build five-player squads and communicate together.
+**Source release: Stage 2 · Player discovery and registration frontend · v0.2.0**
 
-**Published source: Stage 1 · Frontend foundation · Version 0.1.0**
+SquadUp is a mobile-first project for competitive mobile gamers in India. This release expands the Stage 1 PWA foundation with a player directory, filters, profile screens and a four-step registration/login demo. Free Fire is the primary game; sample data also demonstrates BGMI/CODM selection.
 
-This guide documents the code available in this repository. The foundation was published in [commit f221688](https://github.com/tanishqsgit/ETF-SQUAD-UP/commit/f221688d57a216a67dbe21fcc8a5fc75a64f809f). Later implementation exists in the local workspace but is not included in this source release. This update adds documentation and screenshots; it does not publish those later features.
-
-## Contents
-
-- [Screenshots](#screenshots)
-- [Release scope](#release-scope)
-- [Tech stack](#tech-stack)
-- [Step-by-step setup](#step-by-step-setup)
-- [How it works](#how-it-works)
-- [Project structure](#project-structure)
-- [Design and themes](#design-and-themes)
-- [PWA and offline behavior](#pwa-and-offline-behavior)
-- [Configuration and commands](#configuration-and-commands)
-- [Hosting preparation](#hosting-preparation)
-- [Verification](#verification)
-- [Troubleshooting](#troubleshooting)
-- [Release roadmap](#release-roadmap)
-- [Development notes](#development-notes)
+This is a **browser-only frontend demo**. Players, online indicators and statistics are fictional. No server account is created, no phone is verified, no SMS is sent and no real player is contacted. Use invented profile details and a throwaway password. Do not treat local registration as production authentication.
 
 ## Screenshots
 
-Actual screenshots of the **Stage 1 production build**, captured on **October 13, 2026**. These show this repository's code, not mockups or the newer local full-stack app. The temporary screenshot preview used port `4181`; normal preview defaults to `4173`.
+Captured from Stage 2 on October 14, 2026. `STAGE2_DEMO` is a disposable fictional QA profile. Its credentials are not committed.
 
-### Desktop — dark theme
+### Discovery — desktop
 
-Hero, three informational feature cards, release note and footer at a 1440px viewport.
+![Stage 2 discovery](docs/screenshots/stage-2-discovery.jpg)
 
-![Stage 1 desktop dark theme](docs/screenshots/stage-1-desktop-dark.jpg)
+### Directory — role filtering
 
-### Desktop — light theme
+![Stage 2 player directory filtered to sniper](docs/screenshots/stage-2-directory.jpg)
 
-The surrounding page and cards use light tokens; the gaming hero keeps its dark gradient.
+### Registered demo profile — mobile
 
-<details>
-<summary>View the light-theme screenshot</summary>
+<img src="docs/screenshots/stage-2-mobile-profile.jpg" alt="Stage 2 mobile demo profile" width="360">
 
-![Stage 1 desktop light theme](docs/screenshots/stage-1-desktop-light.jpg)
+The [archived Stage 1 guide](docs/STAGE1.md) preserves its documentation and dark/light foundation screenshots. Those describe the earlier source release.
 
-</details>
+## What Stage 2 includes
 
-### Mobile — dark theme
+| Feature               | Behavior                                                                                |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| Discovery             | Gaming hero and sample player cards with profile navigation                             |
+| Search                | Filter by display name or player ID                                                     |
+| Tactical filters      | Role, rank, game, playing hours, device and sample online status                        |
+| Sorting               | Best compatibility match or highest K/D                                                 |
+| Filter reset          | Restores the Free Fire/default-sort view and clears filters/search                      |
+| Compatibility preview | Client-side weighted role, schedule, rank and age score                                 |
+| Player profiles       | ID, role, rank, bio, stats, playing hours, game, device and optional social details     |
+| Registration          | Four steps: credentials → identity/bio → playstyle → device/socials                     |
+| Local login           | Sign in to a demo account registered in this browser/origin                             |
+| Sample exploration    | Explore the fictional SHADOW profile without registration                               |
+| Persistence           | Demo account/session and theme survive reloads in the same browser                      |
+| Responsive navigation | Fixed sidebar on desktop and bottom navigation on mobile                                |
+| Themes/PWA            | Stage 1 theme persistence, manifest, icons and production service-worker setup retained |
 
-At a 360px viewport, the heading wraps and cards stack vertically.
-
-<img src="docs/screenshots/stage-1-mobile-dark.jpg" alt="Stage 1 mobile dark theme" width="360">
-
-## Release scope
-
-| Included                   | Working behavior                                                                |
-| -------------------------- | ------------------------------------------------------------------------------- |
-| Responsive foundation page | Branded header, hero, three project-direction cards, release note and footer    |
-| Dark/light themes          | Header toggle; selection survives reloads in the same browser/origin            |
-| Design tokens              | CSS variables for background, surface, text, border and accent                  |
-| Typography and icons       | Locally bundled fonts and Feather icons                                         |
-| PWA setup                  | Production manifest, generated service worker, shell precache and install icons |
-| Update interface           | Explicit update button when a newer service worker is detected                  |
-| Reproducible dependencies  | Committed npm lockfile                                                          |
-
-**Not published yet:** discovery/filtering, registration/login, player profiles, squad management, invitations, compatibility calculations, live chat, image uploads, databases/APIs, AI, SMS or cloud deployment. The game names describe the intended audience, not live integrations. Feature cards are informational and do not open those future features.
+The card action is **View profile**. Squads, invitations, messaging, live presence, API/database services, real AI, OTP and production authentication remain later source stages. Sample bio generation uses a fixed local template, not an AI model. Profile editing beyond initial registration is not included in this release.
 
 ## Tech stack
 
-Exact versions below come from the committed `package-lock.json`. The ranges in `package.json` may permit newer versions; `npm ci` installs the locked tree.
+| Technology                            | Locked version | Use                                                                   |
+| ------------------------------------- | -------------- | --------------------------------------------------------------------- |
+| React / React DOM                     | 18.3.1         | Components and rendering                                              |
+| React Router DOM                      | 7.18.4         | Client-side routes; approved free upgrade from the original v6 target |
+| Vite                                  | 6.4.4          | Development and production builds                                     |
+| Tailwind CSS / Vite adapter           | 4.3.3          | Styling pipeline with custom theme/component CSS                      |
+| Zustand                               | 5.0.15         | Persisted theme and demo-session stores                               |
+| React Hot Toast                       | 2.6.0          | Registration/login feedback                                           |
+| React Icons                           | 5.7.0          | Feather icons                                                         |
+| Vite PWA plugin                       | 1.3.0          | Manifest, Workbox generation and update hook                          |
+| Fontsource DM Sans / Barlow Condensed | 5.3.0          | Bundled font files                                                    |
+| React Vite plugin                     | 4.7.0          | React build integration                                               |
+| Prettier                              | 3.9.10         | Formatting                                                            |
+| Node.js                               | >=22           | Project prerequisite                                                  |
 
-| Area              | Package                                               | Locked version | Purpose                                                  |
-| ----------------- | ----------------------------------------------------- | -------------- | -------------------------------------------------------- |
-| UI                | `react`, `react-dom`                                  | 18.3.1         | Components, rendering and Strict Mode                    |
-| Build/development | `vite`                                                | 6.4.4          | Development server and production bundling               |
-| React integration | `@vitejs/plugin-react`                                | 4.7.0          | React transformation and development refresh             |
-| Styling           | `tailwindcss`, `@tailwindcss/vite`                    | 4.3.3          | Tailwind v4 pipeline, alongside custom CSS               |
-| State             | `zustand`                                             | 5.0.15         | Isolated persisted theme store                           |
-| Icons             | `react-icons`                                         | 5.7.0          | Crosshair, users, shield, sun, moon and lightning        |
-| PWA               | `vite-plugin-pwa`                                     | 1.3.0          | Manifest, Workbox generation and React registration hook |
-| Fonts             | `@fontsource/dm-sans`, `@fontsource/barlow-condensed` | 5.3.0          | Bundled font assets                                      |
-| Formatting        | `prettier`                                            | 3.9.10         | Source formatting                                        |
-| Prerequisite      | Node.js                                               | >=22           | Project's runtime requirement                            |
-
-This stage has **no React Router, Axios, Socket.io, Express, Sequelize, PostgreSQL or OpenAI dependencies**. They belong to later source releases; cloning this version does not install a backend.
+The lockfile pins installed versions. There is no Axios, Socket.io, Express, Sequelize, PostgreSQL or OpenAI dependency in this frontend release. No API keys, database or cloud account are required to run it locally.
 
 ## Step-by-step setup
 
-### 1. Check prerequisites
+1. Install Node.js 22 or a compatible later version with npm, and Git for cloning.
+2. Clone and enter the repository:
 
-Install Node.js 22 or a compatible later version with npm, and Git for cloning. Use a browser and an editor such as VS Code.
+   ```sh
+   git clone https://github.com/tanishqsgit/ETF-SQUAD-UP.git
+   cd ETF-SQUAD-UP
+   ```
 
-```sh
-node --version
-npm --version
-git --version
-```
+3. Install the exact dependency tree:
 
-No database, Docker, API key, SMS provider or cloud account is required. The foundation needs no paid service to run locally; device and network costs are separate.
+   ```sh
+   npm ci
+   ```
 
-### 2. Clone and enter the project
+4. Start development:
 
-```sh
-git clone https://github.com/tanishqsgit/ETF-SQUAD-UP.git
-cd ETF-SQUAD-UP
-```
+   ```sh
+   npm run dev
+   ```
 
-Alternatively, download/extract the repository ZIP and open a terminal in its folder.
+5. Open Vite's printed URL, normally **http://localhost:5173/**. If occupied, Vite can choose another port. The newer local full-stack workspace may already be using 5173; this release was tested separately on 5182.
+6. Open **Players**, apply filters and choose **View profile**. For an account demo, use **Register**, complete all four steps and then try local sign-out/sign-in.
+7. Build and preview production output:
 
-### 3. Install exact dependencies
+   ```sh
+   npm run build
+   npm run preview
+   ```
 
-```sh
-npm ci
-```
+   Preview normally uses **http://localhost:4173/**. Stop a server with `Ctrl+C`.
 
-This uses the lockfile and needs internet access for uncached packages. Keep `package.json` and `package-lock.json` from the same source checkout.
-
-### 4. Set the base path only if needed
-
-Normal local use defaults to `/`, so `.env` is optional. To copy the public example in Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-On macOS/Linux:
+For a separate fixed development port:
 
 ```sh
-cp .env.example .env
+npm run dev -- --port 5182 --strictPort
 ```
 
-Keep `VITE_BASE_PATH=/` locally. `VITE_` settings are client/build configuration; never place private keys or passwords in them.
+These scripts bind to all interfaces (`0.0.0.0`); LAN access depends on network/firewall settings. They do not deploy a public website. The local demo requires no paid service; device/network costs are separate.
 
-### 5. Start the development server
+## Routes and user flow
 
-```sh
-npm run dev
-```
+| Route          | Screen                                                     |
+| -------------- | ---------------------------------------------------------- |
+| `/`, `/home`   | Discovery                                                  |
+| `/search`      | Player directory; `?q=...` supplies an initial search      |
+| `/profile/:id` | Sample player profile or current locally registered player |
+| `/profile/me`  | Current demo profile; sign in/explore first                |
+| `/register`    | Four-step local registration                               |
+| `/login`       | Local login and sample-profile exploration                 |
+| Other paths    | Page-not-found screen                                      |
 
-Open the printed URL, normally **http://localhost:5173/**. Vite may choose another port if it is occupied; follow the terminal URL rather than an unrelated app already running there.
+Registration collects:
 
-The command binds to `0.0.0.0` and may print a LAN address. Access from another device depends on the network/firewall. This is a development server, not a public production deployment.
+1. **Credentials:** valid-format Indian demo phone and an 8–72 character throwaway password.
+2. **Identity:** 3–30 character display name, age 13–100, optional bio up to 200 characters and a sample-bio button.
+3. **Playstyle:** one game, tactical role, rank and at least one playing slot in IST.
+4. **Device/socials:** Android/iOS, model, optional YouTube URL, Instagram handle and Discord ID.
 
-### 6. Try the working screen
-
-1. Check the Foundation Release badge and Stage 1 release note.
-2. Click the sun icon to switch to light mode.
-3. Reload; light mode should persist.
-4. Click the moon icon to return to dark mode.
-5. Resize the browser; small screens display the cards in one column.
-
-There are no account forms, squad actions or chat rooms in this release.
-
-### 7. Preview a production build
-
-```sh
-npm run build
-npm run preview
-```
-
-Open the preview URL, normally **http://localhost:4173/**. Production assets are generated in `dist/`. Preview serves the existing build; it does not automatically rebuild edits. Stop either server with `Ctrl+C`.
+On completion, the browser assigns a UUID and role-based display ID, saves the demo account and shows its profile. Duplicate demo phone numbers in the same browser are rejected. Stats for a newly registered profile start at zero.
 
 ## How it works
 
 ```mermaid
 flowchart TD
-    HTML["index.html: metadata and root"] --> Entry["main.jsx: fonts, CSS and React mount"]
-    Entry --> App["App.jsx: foundation screen"]
-    Store["Zustand theme store"] --> App
-    Store <--> Saved["localStorage: squadup-theme"]
-    App --> CSS["data-theme and CSS variables"]
-    App --> Registration["PWA registration and update prompt"]
-    Build["Vite production build"] --> Assets["dist: HTML, JS, CSS, fonts and icons"]
-    Build --> PWA["Manifest and Workbox service worker"]
-    PWA --> Assets
+    Entry["main.jsx: fonts, CSS and React root"] --> Routes["StageTwo.jsx: router, layout and discovery"]
+    Routes --> Directory["Directory.jsx: filters and sorting"]
+    Routes --> Account["account.jsx: registration, login and profiles"]
+    Data["data.js: fictional players"] --> Directory
+    Match["matching.js: weighted compatibility"] --> Directory
+    Account --> Local["Browser localStorage"]
+    Theme["Zustand theme store"] --> Local
+    Theme --> Routes
 ```
 
-1. `index.html` provides the metadata and `root` mount element.
-2. `main.jsx` imports global CSS/fonts and mounts `App` inside `React.StrictMode`.
-3. `App` renders the static foundation and subscribes to theme state.
-4. A theme effect changes the root HTML `data-theme` attribute and the `theme-color` meta tag.
-5. The theme action updates Zustand; persistence saves the choice locally.
-6. The production PWA hook registers the generated service worker and exposes update state.
+`usePlayers` returns the fictional fixture array and, while signed in, the current newly registered demo player. Filtering and sorting happen in the browser. No API request is made. Compatibility uses 40% role synergy, 30% schedule overlap (intersection/union), 20% rank proximity and 10% age proximity. Unknown ranks and large age gaps lower the score. The score is a preview based on demo/profile data, not a guarantee of team performance.
 
-There are no player/API requests. The theme choice is not sent to a server.
+Local registration uses a random salt and PBKDF2/SHA-256 with 100,000 iterations for its demo password verifier. The phone/profile, salt and verifier are stored under `squadup-stage2-accounts`; the current session is stored under `squadup-stage2-session`. Theme state uses `squadup-theme`. This is not server-enforced authentication: browser data can be inspected/modified, clearing it removes accounts, and signing in from another browser/origin will not find them. Never use real credentials.
 
-## Project structure
+Theme changes update the root `data-theme` attribute and browser theme-color. Dark remains the default; the original navy/cyan and light teal palettes are retained. Expanded responsive styles support the directory/sidebar/mobile navigation, with `stage2.css` styling the scoped discovery, registration and profile presentation. Sample avatars use external image URLs; initials remain available when images fail.
 
-```text
-ETF-SQUAD-UP/
-├── docs/screenshots/
-│   ├── stage-1-desktop-dark.jpg
-│   ├── stage-1-desktop-light.jpg
-│   └── stage-1-mobile-dark.jpg
-├── public/
-│   ├── icon.svg
-│   ├── icon-192.png
-│   └── icon-512.png
-├── src/
-│   ├── stores/themeStore.js
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── styles.css
-├── .env.example
-├── .gitignore
-├── .prettierrc.json
-├── index.html
-├── package.json
-├── package-lock.json
-├── README.md
-└── vite.config.js
-```
+## Source structure
 
-| File                                                   | Responsibility                                                                           |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| [`index.html`](index.html)                             | Title, description, viewport, theme metadata, favicon, root element and module entry     |
-| [`src/main.jsx`](src/main.jsx)                         | Font/style imports and React mount                                                       |
-| [`src/App.jsx`](src/App.jsx)                           | Static feature array, page sections, theme action/effect and update button               |
-| [`src/stores/themeStore.js`](src/stores/themeStore.js) | Dark default, toggle action and persisted state                                          |
-| [`src/styles.css`](src/styles.css)                     | Tailwind import, color tokens, component styles, focus states and mobile breakpoint      |
-| [`vite.config.js`](vite.config.js)                     | Base path, three plugins, manifest, cache patterns and development port                  |
-| [`public/`](public/)                                   | Favicon and install icons copied to production                                           |
-| [`package.json`](package.json)                         | Metadata, commands, runtime requirement and dependency ranges                            |
-| [`package-lock.json`](package-lock.json)               | Exact npm dependency tree                                                                |
-| [`.env.example`](.env.example)                         | Public base-path example                                                                 |
-| [`.gitignore`](.gitignore)                             | Excludes dependencies, builds, private env files, logs, coverage and temporary artifacts |
-| [`.prettierrc.json`](.prettierrc.json)                 | Formatting preferences                                                                   |
-| [`docs/screenshots/`](docs/screenshots/)               | Tracked images embedded in this guide                                                    |
+| File                               | Responsibility                                                               |
+| ---------------------------------- | ---------------------------------------------------------------------------- |
+| `index.html`                       | Metadata, favicon and React root                                             |
+| `src/main.jsx`                     | Font/CSS imports and Strict Mode mount                                       |
+| `src/StageTwo.jsx`                 | Routes, layout, discovery, theme effect and PWA update prompt                |
+| `src/Directory.jsx`                | Search/filter controls, results, empty state and sorting                     |
+| `src/components.jsx`               | Player cards, avatars, headings, demo notice and profile navigation          |
+| `src/account.jsx`                  | Four-step registration, local password verifier, login and profile rendering |
+| `src/data.js`                      | Fictional players, roles, ranks, time slots and sample profile               |
+| `src/hooks.js`                     | Browser-only player data hook                                                |
+| `src/matching.js`                  | Compatibility score and breakdown                                            |
+| `src/stores.js`                    | Isolated persisted demo-session store                                        |
+| `src/stores/themeStore.js`         | Persisted theme store                                                        |
+| `src/styles.css`, `src/stage2.css` | Shared styling and Stage 2 presentation                                      |
+| `tests/matching.test.js`           | Compatibility weight/boundary checks                                         |
+| `public/`                          | SVG favicon and 192/512 PNG install icons                                    |
+| `vite.config.js`                   | React, Tailwind and PWA plugins; base-path config                            |
+| `docs/`                            | Screenshots and archived Stage 1 guide                                       |
 
-`node_modules/` and `dist/` are generated locally and ignored. No `server/`, migrations or API routes exist in this published stage.
+## Commands and configuration
 
-## Design and themes
+| Command           | Purpose                                           |
+| ----------------- | ------------------------------------------------- |
+| `npm ci`          | Install locked dependencies                       |
+| `npm run dev`     | Start development server                          |
+| `npm run build`   | Generate production/PWA assets in ignored `dist/` |
+| `npm run preview` | Serve the already-built output locally            |
+| `npm test`        | Run Node compatibility tests                      |
+| `npm run format`  | Format source and Vite config with write mode     |
+| `npm audit`       | Query dependency advisories                       |
 
-### Actual color tokens
+`.env` is optional. `.env.example` contains `VITE_BASE_PATH=/`; this public setting controls assets, router basename, PWA scope/start URL and navigation fallback. Restart development/rebuild after changing it. Never put secrets into `VITE_` variables.
 
-| Variable      | Dark theme               | Light theme |
-| ------------- | ------------------------ | ----------- |
-| `--bg`        | `#060A13`                | `#F8FAFC`   |
-| `--surface`   | `#0F1629`                | `#FFFFFF`   |
-| `--text`      | `#F1F5F9`                | `#0F172A`   |
-| `--secondary` | `#94A3B8`                | `#64748B`   |
-| `--border`    | `rgba(255,255,255,0.08)` | `#E2E8F0`   |
-| `--accent`    | `#00F0FF`                | `#0E7490`   |
-
-The hero has a fixed navy/teal gradient and cyan heading in both modes. Other planned status/rank/premium tokens are not all implemented in this foundation.
-
-### Typography, responsiveness and accessibility
-
-- DM Sans weights 400, 600 and 700 are imported for interface text.
-- Barlow Condensed weight 800 is imported for the hero headline.
-- Font files are bundled locally; no hosted font API is needed at runtime.
-- Heading size uses `clamp(40px, 7vw, 72px)`.
-- The centered shell has an `1120px` maximum width.
-- Cards use three equal columns and `18px` gaps above `600px`.
-- At `600px` and below, cards stack, padding decreases and the decorative icon shifts away from text.
-- The theme button has at least a `44px` touch target, a descriptive action label and visible keyboard focus styling.
-- The page uses semantic landmarks/headings. Decorative hero graphics use `aria-hidden`.
-
-Mobile bottom navigation and a full-app desktop sidebar are later features. No formal accessibility certification is claimed.
-
-### Persisted theme behavior
-
-`useThemeStore` starts with `theme: 'dark'`. `toggleTheme()` switches the value; Zustand `persist` saves it under **`squadup-theme`** in localStorage. `App` sets `document.documentElement.dataset.theme` and updates the browser theme-color to `#060A13` or `#F8FAFC`.
-
-Persistence belongs to that browser/origin. A preference at `localhost:5173` does not transfer automatically to `localhost:4173`, another browser or another device. Clearing site data resets it. Appearance state contains no account credentials.
-
-## PWA and offline behavior
-
-| Setting                  | Configuration                                                   |
-| ------------------------ | --------------------------------------------------------------- |
-| Name / short name        | `SquadUp — Esports Team Finder` / `SquadUp`                     |
-| Display                  | `standalone`                                                    |
-| Theme / background color | `#060A13`                                                       |
-| Start URL / scope        | Configured base path                                            |
-| Icons                    | 192×192 PNG; 512×512 PNG declared for `any maskable`; SVG asset |
-| Registration             | `prompt`                                                        |
-| Precache patterns        | JS, CSS, HTML, SVG, PNG and WOFF2                               |
-| Navigation fallback      | `<base>index.html`                                              |
-| Runtime cache rules      | None                                                            |
-
-Build output contains `manifest.webmanifest`, `sw.js` and a Workbox helper. The verified documentation build produced **15 precache entries, approximately 250.01 KiB**; this changes with source/dependencies and files scanned by the styling pipeline.
-
-Test the PWA using the production preview on localhost or an appropriate HTTPS host. Development mode does not enable this production cache. A successful first online visit is needed to cache the shell; an unvisited page cannot load offline. Once cached, this static foundation can reload with its server unavailable. It has no live API/multiplayer data to cache.
-
-When `needRefresh` is true, **“New version available · Update”** appears. Clicking calls `updateServiceWorker(true)` to activate/reload. The button is conditional, not always visible. A two-release deployment update scenario has not been verified here.
-
-Installation UI varies by browser/device. Use the browser's install/add-to-home-screen action if offered. Successful PWA generation does not prove installation on every device; installation itself was not verified in this update.
-
-## Configuration and commands
-
-| Setting          | Default | Purpose                                                                                 |
-| ---------------- | ------- | --------------------------------------------------------------------------------------- |
-| `VITE_BASE_PATH` | `/`     | Public asset URL prefix, home link, PWA start/scope, icon paths and navigation fallback |
-
-The Vite config reads `VITE_` settings through `loadEnv`. Restart development after env changes and rebuild after changing the deployment prefix.
-
-| Command           | Behavior                                                  |
-| ----------------- | --------------------------------------------------------- |
-| `npm ci`          | Install the locked dependency tree                        |
-| `npm run dev`     | Start Vite, requesting port 5173, bound to all interfaces |
-| `npm run build`   | Create production/PWA output in `dist/`                   |
-| `npm run preview` | Serve the existing build locally                          |
-| `npm run format`  | Prettier write mode on `src` and `vite.config.js`         |
-| `npm audit`       | Query npm dependency advisories                           |
-
-There is no `npm test`, seed, migration or backend-start script in Stage 1. Formatting changes source files; inspect the resulting diff. The formatter uses single quotes, trailing commas where supported and a 100-character print width.
-
-To choose a free port explicitly and prevent fallback:
-
-```sh
-npm run dev -- --port 5174 --strictPort
-```
-
-For a production preview after building:
-
-```sh
-npm run preview -- --port 4181 --strictPort
-```
-
-Run each server in its own terminal.
-
-## Hosting preparation
-
-This repository contains source, **not an enabled hosted deployment**. A configured static host can serve the generated `dist/` files. Preview is for local inspection, not production hosting.
-
-Use `/` for domain-root hosting. A future GitHub Pages project site at `/ETF-SQUAD-UP/` needs that exact prefix, including the trailing slash. Windows PowerShell example:
+For a future project deployment at `/ETF-SQUAD-UP/`, set that base path before building. Windows PowerShell:
 
 ```powershell
 $env:VITE_BASE_PATH = '/ETF-SQUAD-UP/'
@@ -332,82 +190,53 @@ npm run build
 Remove-Item Env:VITE_BASE_PATH
 ```
 
-macOS/Linux example:
+Client-side routing requires the host to serve `index.html` for application paths. **GitHub Pages hosting is not enabled by this push**, and Pages does not provide that rewrite automatically. Configure a suitable SPA fallback or routing strategy before deploying deep links. Preview/build success alone is not a public deployment.
 
-```sh
-VITE_BASE_PATH=/ETF-SQUAD-UP/ npm run build
-```
+## PWA and verification
 
-Configure the host and deploy `dist/` separately. This documentation push enables no Pages workflow, public website, custom domain, HTTPS certificate or AWS resource.
+The production build generates the manifest, Workbox helper and service worker. JS/CSS/HTML/SVG/PNG/WOFF2 assets are precached; the navigation fallback uses the configured base. Runtime cache rules remain empty. Development mode does not enable this production offline cache. A prior successful production visit is needed for offline shell caching; sample external avatars may need a network connection.
 
-## Verification
+The update prompt is conditional: a detected newer service worker offers **New version available · Update**. Device installation and a two-deployment update flow still need verification. The Stage 1 offline-shell result is documented in the archive; Stage 2 checks are recorded separately below.
 
-Checks performed against the published foundation on **October 13, 2026**:
+Verified October 14, 2026:
 
-| Check                | Result / scope                                                                     |
-| -------------------- | ---------------------------------------------------------------------------------- |
-| Production build     | Passed; client bundle, manifest and generated service worker                       |
-| Dependency audit     | Zero known vulnerabilities in the foundation's dependency tree                     |
-| Desktop layout       | Passed at 1440px; three columns, no horizontal overflow                            |
-| Mobile layout        | Passed at 360px; one column, no horizontal overflow                                |
-| Theme toggle         | Dark → light → dark passed                                                         |
-| Theme persistence    | Light mode survived reload                                                         |
-| Offline shell reload | Preview stopped; direct HTTP failed; browser reload still rendered the cached page |
-| Screenshots          | Desktop dark/light and mobile dark captured from this build                        |
+- Production bundle and PWA generation.
+- Combined sniper/iOS filters returned the expected sample player; View profile opened it.
+- All four registration steps, sample bio and locally created profile.
+- Profile/session persistence after reload, sign-out, incorrect-password rejection and successful login.
+- Mobile filter toggle and one-result filtering; directory and profile had no horizontal overflow at 360px.
+- Desktop screenshots and mobile profile screenshot; no browser console errors in the exercised flow.
+- Compatibility unit tests and dependency audit (see release checks).
 
-Repeat installation/build/audit:
-
-```sh
-npm ci
-npm run build
-npm audit
-```
-
-The screenshots used a separate temporary preview origin, preserving the newer local app. The preview and temporary tab were closed afterward. Tracked relative image paths make screenshots viewable on GitHub without private local paths.
-
-These checks are not a security certification. No backend, matching, cloud, chat latency, two-release PWA upgrade, cross-device install or automated accessibility validation is claimed in this source stage.
+These checks cover the frontend demo, not backend security, real presence, latency, real-device installation or cloud integrations.
 
 ## Troubleshooting
 
-| Symptom                               | Action                                                                                         |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `node`/`npm` not found                | Install prerequisites, reopen the terminal and check versions                                  |
-| Lockfile mismatch                     | Use matching package/lock files from the same checkout                                         |
-| Different SquadUp screen appears      | Read Vite's printed URL; another app may occupy the usual port                                 |
-| Port occupied                         | Stop the correct old process or use a free port with `--strictPort`                            |
-| Old/missing preview build             | Rebuild before previewing; preview does not build automatically                                |
-| Assets/icons fail on a subpath        | Set matching `VITE_BASE_PATH` with trailing slash and rebuild                                  |
-| Old cached release                    | Use its update prompt or inspect/reset that origin's cache/service worker in browser dev tools |
-| Theme resets after clearing site data | Select it again; site data includes the persisted theme                                        |
-| First offline visit fails             | Load the production page successfully online before testing offline                            |
-| Install option missing                | Check browser support, origin and manifest; dev mode is not the production PWA test            |
-| Cards do not open squads/chat         | They are static direction cards; those features are not published yet                          |
+| Issue                                    | Check                                                                                 |
+| ---------------------------------------- | ------------------------------------------------------------------------------------- |
+| A different SquadUp app appears          | Follow the printed Vite port; the full local app may use 5173                         |
+| Login fails after switching port/browser | Accounts belong to their browser origin; register there or use Explore sample profile |
+| Profile not found                        | Select a fixture or sign in/explore before `/profile/me`                              |
+| No players match                         | Reset filters or choose another game                                                  |
+| Mobile filters missing                   | Use the Filters button                                                                |
+| Changes missing in preview               | Rebuild; preview does not rebuild source                                              |
+| Old service-worker content               | Use its update prompt or inspect/reset that origin's browser cache                    |
+| Hosted deep link returns 404             | Configure SPA fallback/routing and the correct base path                              |
+| Avatar unavailable                       | External sample images need network access; initials provide a fallback               |
 
-## Release roadmap
+## Publication roadmap
 
-This table describes **source publication stages**, separate from local development milestones. Later releases should use reviewable commits with actual dates and matching documentation.
+| Stage | Scope                                                   | Status          |
+| ----- | ------------------------------------------------------- | --------------- |
+| 1     | React/Vite, themes and PWA foundation                   | Published       |
+| 2     | Discovery, filters, profiles and registration frontend  | Current release |
+| 3     | Squad roster, invitations and analysis interface        | Not published   |
+| 4     | PostgreSQL, production authentication and API routes    | Not published   |
+| 5     | Socket.io messaging, presence and media                 | Not published   |
+| 6     | Full-stack hardening, integration checks and deployment | Not published   |
 
-| Stage | Scope                                                    | Published status |
-| ----- | -------------------------------------------------------- | ---------------- |
-| 1     | React/Vite foundation, styling, persistent theme and PWA | Published        |
-| 2     | Discovery, filters, profiles and registration frontend   | Not published    |
-| 3     | Squad roster, invites and analysis interface             | Not published    |
-| 4     | PostgreSQL models, authentication and API routes         | Not published    |
-| 5     | Socket.io messaging, presence and media integration      | Not published    |
-| 6     | Full-stack tests, hardening and deployment documentation | Not published    |
+These source publication stages differ from milestones in the newer local workspace. This push contains Stage 2 frontend code and documentation only. No secrets, real users, local databases, uploads, backend code or newer squad/chat functionality are included.
 
-Later target architecture includes React Router, Axios, additional Zustand stores, Express, Sequelize/PostgreSQL, authenticated Socket.io and optional OpenAI/S3/Redis/SMS integrations. AWS is an intended optional deployment direction. They need later source releases and configuration; none is required to run today's foundation.
-
-## Development notes
-
-1. Read the current release scope before proposing a feature.
-2. Reuse theme variables and keep mobile layouts usable.
-3. Preserve theme persistence, PWA registration and base-path behavior.
-4. Format source edits, inspect changes and build before committing.
-5. Update the screenshots and guide when visible behavior changes.
-6. Keep `node_modules`, `dist`, credentials and private env files out of commits. `.env.example` is intentionally public.
-7. Describe actual behavior/checks in commits; do not represent planned features as shipped.
-
-No standalone license file is included in this source release. Do not infer a license for the project's own code from dependency licenses.
+Use actual commit dates and describe shipped behavior accurately. Keep generated builds, dependencies and private env files out of commits. No standalone license file has been added; do not infer a project license from dependency licenses.
 
 **Built for players. Powered by teamwork.**
