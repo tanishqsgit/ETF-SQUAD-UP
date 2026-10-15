@@ -1,242 +1,102 @@
 # SquadUp — Esports Team Finder
 
-**Find your squad. Dominate together.**
+Mobile-first React 18 / Vite / Tailwind v4 PWA with Express, Sequelize PostgreSQL, authenticated Socket.io chat, Redis adapter, S3 uploads, and OpenAI services. Dark and light themes, player discovery, weighted matching, four-step registration, player profiles, squad creation, five-slot rosters, seven-day invites, squad analysis, and direct/squad chat are implemented.
 
-**Source release: Stage 2 · Player discovery and registration frontend · v0.2.0**
+**Full source release — October 15, 2026.** All implemented local application source is now included, replacing the earlier frontend-only publication stages. This is source publication to GitHub, not a hosted production deployment. Public-launch gaps are listed below. The default client can run as a labeled browser-only demo; configure PostgreSQL and `VITE_DEMO_MODE=false` for real local accounts and chat.
 
-SquadUp is a mobile-first project for competitive mobile gamers in India. This release expands the Stage 1 PWA foundation with a player directory, filters, profile screens and a four-step registration/login demo. Free Fire is the primary game; sample data also demonstrates BGMI/CODM selection.
+Screenshots and the guides for the earlier [Stage 1](docs/STAGE1.md) and [Stage 2](docs/STAGE2.md) releases are retained as history. The current app includes additional squad, messaging and backend features. See [release notes](docs/FULL-RELEASE.md) for scope, setup and verification.
 
-This is a **browser-only frontend demo**. Players, online indicators and statistics are fictional. No server account is created, no phone is verified, no SMS is sent and no real player is contacted. Use invented profile details and a throwaway password. Do not treat local registration as production authentication.
+## Current local setup — stages 1 through 9
 
-## Screenshots
+The original development workspace uses a separate, password-protected PostgreSQL cluster on `127.0.0.1:55432`, initialized with the existing Windows PostgreSQL tools. The original PostgreSQL service and its data are unchanged. App data uses `squadup`; integration tests use `squadup_test`. Connection credentials and the JWT secret live in ignored `.env` and are not published. A new clone contains no pre-existing database or accounts; initialize your own environment using the full-stack instructions below.
 
-Captured from Stage 2 on October 14, 2026. `STAGE2_DEMO` is a disposable fictional QA profile. Its credentials are not committed.
-
-### Discovery — desktop
-
-![Stage 2 discovery](docs/screenshots/stage-2-discovery.jpg)
-
-### Directory — role filtering
-
-![Stage 2 player directory filtered to sniper](docs/screenshots/stage-2-directory.jpg)
-
-### Registered demo profile — mobile
-
-<img src="docs/screenshots/stage-2-mobile-profile.jpg" alt="Stage 2 mobile demo profile" width="360">
-
-The [archived Stage 1 guide](docs/STAGE1.md) preserves its documentation and dark/light foundation screenshots. Those describe the earlier source release.
-
-## What Stage 2 includes
-
-| Feature               | Behavior                                                                                |
-| --------------------- | --------------------------------------------------------------------------------------- |
-| Discovery             | Gaming hero and sample player cards with profile navigation                             |
-| Search                | Filter by display name or player ID                                                     |
-| Tactical filters      | Role, rank, game, playing hours, device and sample online status                        |
-| Sorting               | Best compatibility match or highest K/D                                                 |
-| Filter reset          | Restores the Free Fire/default-sort view and clears filters/search                      |
-| Compatibility preview | Client-side weighted role, schedule, rank and age score                                 |
-| Player profiles       | ID, role, rank, bio, stats, playing hours, game, device and optional social details     |
-| Registration          | Four steps: credentials → identity/bio → playstyle → device/socials                     |
-| Local login           | Sign in to a demo account registered in this browser/origin                             |
-| Sample exploration    | Explore the fictional SHADOW profile without registration                               |
-| Persistence           | Demo account/session and theme survive reloads in the same browser                      |
-| Responsive navigation | Fixed sidebar on desktop and bottom navigation on mobile                                |
-| Themes/PWA            | Stage 1 theme persistence, manifest, icons and production service-worker setup retained |
-
-The card action is **View profile**. Squads, invitations, messaging, live presence, API/database services, real AI, OTP and production authentication remain later source stages. Sample bio generation uses a fixed local template, not an AI model. Profile editing beyond initial registration is not included in this release.
-
-## Tech stack
-
-| Technology                            | Locked version | Use                                                                   |
-| ------------------------------------- | -------------- | --------------------------------------------------------------------- |
-| React / React DOM                     | 18.3.1         | Components and rendering                                              |
-| React Router DOM                      | 7.18.4         | Client-side routes; approved free upgrade from the original v6 target |
-| Vite                                  | 6.4.4          | Development and production builds                                     |
-| Tailwind CSS / Vite adapter           | 4.3.3          | Styling pipeline with custom theme/component CSS                      |
-| Zustand                               | 5.0.15         | Persisted theme and demo-session stores                               |
-| React Hot Toast                       | 2.6.1          | Registration/login feedback                                           |
-| React Icons                           | 5.7.0          | Feather icons                                                         |
-| Vite PWA plugin                       | 1.3.0          | Manifest, Workbox generation and update hook                          |
-| Fontsource DM Sans / Barlow Condensed | 5.3.0          | Bundled font files                                                    |
-| React Vite plugin                     | 4.7.0          | React build integration                                               |
-| Prettier                              | 3.9.10         | Formatting                                                            |
-| Node.js                               | >=22           | Project prerequisite                                                  |
-
-The lockfile pins installed versions. There is no Axios, Socket.io, Express, Sequelize, PostgreSQL or OpenAI dependency in this frontend release. No API keys, database or cloud account are required to run it locally.
-
-## Step-by-step setup
-
-1. Install Node.js 22 or a compatible later version with npm, and Git for cloning.
-2. Clone and enter the repository:
-
-   ```sh
-   git clone https://github.com/tanishqsgit/ETF-SQUAD-UP.git
-   cd ETF-SQUAD-UP
-   ```
-
-3. Install the exact dependency tree:
-
-   ```sh
-   npm ci
-   ```
-
-4. Start development:
-
-   ```sh
-   npm run dev
-   ```
-
-5. Open Vite's printed URL, normally **http://localhost:5173/**. If occupied, Vite can choose another port. The newer local full-stack workspace may already be using 5173; this release was tested separately on 5182.
-6. Open **Players**, apply filters and choose **View profile**. For an account demo, use **Register**, complete all four steps and then try local sign-out/sign-in.
-7. Build and preview production output:
-
-   ```sh
-   npm run build
-   npm run preview
-   ```
-
-   Preview normally uses **http://localhost:4173/**. Stop a server with `Ctrl+C`.
-
-For a separate fixed development port:
-
-```sh
-npm run dev -- --port 5182 --strictPort
-```
-
-These scripts bind to all interfaces (`0.0.0.0`); LAN access depends on network/firewall settings. They do not deploy a public website. The local demo requires no paid service; device/network costs are separate.
-
-## Routes and user flow
-
-| Route          | Screen                                                     |
-| -------------- | ---------------------------------------------------------- |
-| `/`, `/home`   | Discovery                                                  |
-| `/search`      | Player directory; `?q=...` supplies an initial search      |
-| `/profile/:id` | Sample player profile or current locally registered player |
-| `/profile/me`  | Current demo profile; sign in/explore first                |
-| `/register`    | Four-step local registration                               |
-| `/login`       | Local login and sample-profile exploration                 |
-| Other paths    | Page-not-found screen                                      |
-
-Registration collects:
-
-1. **Credentials:** valid-format Indian demo phone and an 8–72 character throwaway password.
-2. **Identity:** 3–30 character display name, age 13–100, optional bio up to 200 characters and a sample-bio button.
-3. **Playstyle:** one game, tactical role, rank and at least one playing slot in IST.
-4. **Device/socials:** Android/iOS, model, optional YouTube URL, Instagram handle and Discord ID.
-
-On completion, the browser assigns a UUID and role-based display ID, saves the demo account and shows its profile. Duplicate demo phone numbers in the same browser are rejected. Stats for a newly registered profile start at zero.
-
-## How it works
-
-```mermaid
-flowchart TD
-    Entry["main.jsx: fonts, CSS and React root"] --> Routes["StageTwo.jsx: router, layout and discovery"]
-    Routes --> Directory["Directory.jsx: filters and sorting"]
-    Routes --> Account["account.jsx: registration, login and profiles"]
-    Data["data.js: fictional players"] --> Directory
-    Match["matching.js: weighted compatibility"] --> Directory
-    Account --> Local["Browser localStorage"]
-    Theme["Zustand theme store"] --> Local
-    Theme --> Routes
-```
-
-`usePlayers` returns the fictional fixture array and, while signed in, the current newly registered demo player. Filtering and sorting happen in the browser. No API request is made. Compatibility uses 40% role synergy, 30% schedule overlap (intersection/union), 20% rank proximity and 10% age proximity. Unknown ranks and large age gaps lower the score. The score is a preview based on demo/profile data, not a guarantee of team performance.
-
-Local registration uses a random salt and PBKDF2/SHA-256 with 100,000 iterations for its demo password verifier. The phone/profile, salt and verifier are stored under `squadup-stage2-accounts`; the current session is stored under `squadup-stage2-session`. Theme state uses `squadup-theme`. This is not server-enforced authentication: browser data can be inspected/modified, clearing it removes accounts, and signing in from another browser/origin will not find them. Never use real credentials.
-
-Theme changes update the root `data-theme` attribute and browser theme-color. Dark remains the default; the original navy/cyan and light teal palettes are retained. Expanded responsive styles support the directory/sidebar/mobile navigation, with `stage2.css` styling the scoped discovery, registration and profile presentation. Sample avatars use external image URLs; initials remain available when images fail.
-
-## Source structure
-
-| File                               | Responsibility                                                               |
-| ---------------------------------- | ---------------------------------------------------------------------------- |
-| `index.html`                       | Metadata, favicon and React root                                             |
-| `src/main.jsx`                     | Font/CSS imports and Strict Mode mount                                       |
-| `src/StageTwo.jsx`                 | Routes, layout, discovery, theme effect and PWA update prompt                |
-| `src/Directory.jsx`                | Search/filter controls, results, empty state and sorting                     |
-| `src/components.jsx`               | Player cards, avatars, headings, demo notice and profile navigation          |
-| `src/account.jsx`                  | Four-step registration, local password verifier, login and profile rendering |
-| `src/data.js`                      | Fictional players, roles, ranks, time slots and sample profile               |
-| `src/hooks.js`                     | Browser-only player data hook                                                |
-| `src/matching.js`                  | Compatibility score and breakdown                                            |
-| `src/stores.js`                    | Isolated persisted demo-session store                                        |
-| `src/stores/themeStore.js`         | Persisted theme store                                                        |
-| `src/styles.css`, `src/stage2.css` | Shared styling and Stage 2 presentation                                      |
-| `tests/matching.test.js`           | Compatibility weight/boundary checks                                         |
-| `public/`                          | SVG favicon and 192/512 PNG install icons                                    |
-| `vite.config.js`                   | React, Tailwind and PWA plugins; base-path config                            |
-| `docs/`                            | Screenshots and archived Stage 1 guide                                       |
-
-## Commands and configuration
-
-| Command           | Purpose                                           |
-| ----------------- | ------------------------------------------------- |
-| `npm ci`          | Install locked dependencies                       |
-| `npm run dev`     | Start development server                          |
-| `npm run build`   | Generate production/PWA assets in ignored `dist/` |
-| `npm run preview` | Serve the already-built output locally            |
-| `npm test`        | Run Node compatibility tests                      |
-| `npm run format`  | Format source and Vite config with write mode     |
-| `npm audit`       | Query dependency advisories                       |
-
-`.env` is optional. `.env.example` contains `VITE_BASE_PATH=/`; this public setting controls assets, router basename, PWA scope/start URL and navigation fallback. Restart development/rebuild after changing it. Never put secrets into `VITE_` variables.
-
-For a future project deployment at `/ETF-SQUAD-UP/`, set that base path before building. Windows PowerShell:
+After restarting the PC, start the local database and app with:
 
 ```powershell
-$env:VITE_BASE_PATH = '/ETF-SQUAD-UP/'
-npm run build
-Remove-Item Env:VITE_BASE_PATH
+node scripts/local-db.mjs
+npm run db:migrate
+npm run server
 ```
 
-Client-side routing requires the host to serve `index.html` for application paths. **GitHub Pages hosting is not enabled by this push**, and Pages does not provide that rewrite automatically. Configure a suitable SPA fallback or routing strategy before deploying deep links. Preview/build success alone is not a public deployment.
+In a second terminal, run `npm run dev` and open **http://localhost:5173**. The database helper defaults to `D:/PostgreSQL/bin`; set `POSTGRES_BIN` if the installed binaries move. The existing `4173` preview is not the configured live client origin.
 
-## PWA and verification
+The live verification script creates three local QA accounts and stores generated test credentials in ignored `.local/test-accounts.json`. These credentials are not in the repository; no SMS is sent. You can also create your own account through registration.
 
-The production build generates the manifest, Workbox helper and service worker. JS/CSS/HTML/SVG/PNG/WOFF2 assets are precached; the navigation fallback uses the configured base. Runtime cache rules remain empty. Development mode does not enable this production offline cache. A prior successful production visit is needed for offline shell caching; sample external avatars may need a network connection.
+Stages completed locally: real database migrations and constraints; registration/login/session verification; persisted direct/group messaging, typing, presence, read receipts, and reconnect tests; leader-approved join requests and invitation acceptance/rejection with a notification inbox; and full editing of profile, game, role, rank, schedule, device, social links, and self-reported stats.
 
-The update prompt is conditional: a detected newer service worker offers **New version available · Update**. Device installation and a two-deployment update flow still need verification. The Stage 1 offline-shell result is documented in the archive; Stage 2 checks are recorded separately below.
+Re-run live verification with `node scripts/verify-live.mjs` while the API is running. This creates labeled local test squads and retains them in the development database. Run `node --env-file=.env --test server/tests/database.integration.js` for the dedicated test database suite.
 
-Verified October 14, 2026:
+The next free local stages are also implemented: (6) private screenshot storage with image decoding and WebP re-encoding; (7) template bio generation and rule-based roster analysis; (8) the approved React Router upgrade to 7.18.4, with zero audit findings at its original verification; (9) local backup/restore verification and production PWA shell checks. No paid services or cloud resources were activated. These implementations are included in this full source release.
 
-- Production bundle and PWA generation.
-- Combined sniper/iOS filters returned the expected sample player; View profile opened it.
-- All four registration steps, sample bio and locally created profile.
-- Profile/session persistence after reload, sign-out, incorrect-password rejection and successful login.
-- Mobile filter toggle and one-result filtering; directory and profile had no horizontal overflow at 360px.
-- Desktop screenshots and mobile profile screenshot; no browser console errors in the exercised flow.
-- Compatibility unit tests and dependency audit (see release checks).
+`FREE_MODE=true` disables OpenAI, Redis and SMS provider calls, and uses local screenshots even if optional provider credentials are present. Password login remains available. Template bios and roster rules are explicitly labeled; they do not use an AI model. Chat moderation uses a limited local blocklist.
 
-These checks cover the frontend demo, not backend security, real presence, latency, real-device installation or cloud integrations.
+Run `node scripts/verify-free.mjs` to check free-mode guards and authenticated screenshot delivery. Uploaded JPG/PNG/WebP files must be under 5 MB and 16 megapixels; images are decoded, stripped of metadata and re-encoded. Private files live under ignored `.local/uploads` (100 MB per player, 500 MB total). Viewing requires conversation access; attachment references alone do not provide access. Abandoned uploads count toward the quota; automated cleanup is not implemented.
 
-## Troubleshooting
+Run `node scripts/backup-local.mjs` with app writes paused to back up PostgreSQL and local screenshots into ignored `.local/backups`. It verifies recovery in a new disposable database, compares six table counts, checks referenced attachment files and removes only that temporary database. It never restores over the live database. This copy is not protection against losing the whole PC; keep another private copy elsewhere. The helper is restricted to a local database named `squadup`.
 
-| Issue                                    | Check                                                                                 |
-| ---------------------------------------- | ------------------------------------------------------------------------------------- |
-| A different SquadUp app appears          | Follow the printed Vite port; the full local app may use 5173                         |
-| Login fails after switching port/browser | Accounts belong to their browser origin; register there or use Explore sample profile |
-| Profile not found                        | Select a fixture or sign in/explore before `/profile/me`                              |
-| No players match                         | Reset filters or choose another game                                                  |
-| Mobile filters missing                   | Use the Filters button                                                                |
-| Changes missing in preview               | Rebuild; preview does not rebuild source                                              |
-| Old service-worker content               | Use its update prompt or inspect/reset that origin's browser cache                    |
-| Hosted deep link returns 404             | Configure SPA fallback/routing and the correct base path                              |
-| Avatar unavailable                       | External sample images need network access; initials provide a fallback               |
+## Local preview
 
-## Publication roadmap
+```powershell
+npm ci
+npm run dev
+```
 
-| Stage | Scope                                                   | Status          |
-| ----- | ------------------------------------------------------- | --------------- |
-| 1     | React/Vite, themes and PWA foundation                   | Published       |
-| 2     | Discovery, filters, profiles and registration frontend  | Current release |
-| 3     | Squad roster, invitations and analysis interface        | Not published   |
-| 4     | PostgreSQL, production authentication and API routes    | Not published   |
-| 5     | Socket.io messaging, presence and media                 | Not published   |
-| 6     | Full-stack hardening, integration checks and deployment | Not published   |
+Open http://localhost:5173. With no environment file, the client defaults to a **labeled local demo**. Sample players are fictional; messages, squad changes, and sample bio generation stay on this browser. Demo invitation links only work in the same browser. Demo credentials are locally hashed for convenience, not a production authentication mechanism. Never use real passwords in the demo. Demo mode never calls the backend.
 
-These source publication stages differ from milestones in the newer local workspace. This push contains Stage 2 frontend code and documentation only. No secrets, real users, local databases, uploads, backend code or newer squad/chat functionality are included.
+## Run the full stack
 
-Use actual commit dates and describe shipped behavior accurately. Keep generated builds, dependencies and private env files out of commits. No standalone license file has been added; do not infer a project license from dependency licenses.
+1. Copy `.env.example` to `.env`. Set a unique `JWT_SECRET` (at least 32 characters), `DATABASE_URL`, and `VITE_DEMO_MODE=false`.
+2. Start PostgreSQL 16 and optionally Redis. `compose.yaml` provides local services: set `POSTGRES_PASSWORD`, then run `docker compose up -d`. Match that password in `DATABASE_URL`. The Docker engine must be running.
+3. Run `npm run db:migrate`. Migrations are versioned, transactional, and advisory-locked; startup never uses schema alteration. New schema changes should be added as explicit migrations.
+4. Optional local seed: set `SEED_PASSWORD` (at least 12 characters), then run `npm run db:seed`. Seed never runs automatically and refuses production environments.
+5. Run `npm run server` in one terminal and `npm run dev` in another. Restart Vite after changing client environment variables.
+6. Keep `FREE_MODE=true` for the current local workflow. Optionally set it to `false` and configure `OPENAI_API_KEY` for GPT-4o-mini bios, roster advice, and `omni-moderation-latest`. Without an enabled client, bios use templates, squad analysis uses labeled deterministic rules, and chat uses its local blocklist.
+7. Optional external integration, with free mode off: set `REDIS_URL`, `OTP_PROVIDER_URL`, and `OTP_PROVIDER_TOKEN` to enable phone OTP. The provider must accept a POST with `{phone, code}` and bearer authentication. Codes expire after five minutes, are HMAC-hashed, and are atomically limited to five attempts. Password login works independently.
+8. Optional external integration, with free mode off: set `S3_BUCKET`, `AWS_REGION`, and an IAM role for screenshot uploads. The bucket stays private; signed reads require conversation access. Configure S3 CORS to allow your exact client origin and PUT with Content-Type. That separate S3 flow still requires external verification and server-side image inspection.
 
-**Built for players. Powered by teamwork.**
+## Verification
+
+```powershell
+npm test
+npm run build
+npm audit
+```
+
+Tests cover matching weights, rank/age edge cases, roster warnings, phone validation, age/privilege validation, message destination invariants, deterministic DM rooms, and cookie parsing. PostgreSQL integration tests can be run with `TEST_DATABASE_URL=... node --test server/tests/database.integration.js` against a **dedicated empty test database**, after its migrations. The tests create and roll back their own data. UI QA is recorded in `VERIFICATION.md`.
+
+## API overview
+
+All API errors have `{success:false,error:"Message"}`. Protected endpoints require a bearer JWT or the HttpOnly session cookie. Public player responses exclude phone, email, and password hashes. JWTs live for twelve hours and use fixed issuer/audience and HS256. Cookies use SameSite Strict and Secure in production. Request origins are checked on writes. Socket sessions disconnect at JWT expiry.
+
+- `POST /api/auth/register`, `/login`, `/otp/request`, `/otp/verify`, `/logout`; `GET /api/auth/me`
+- `GET /api/players?q=&role=&rank=&time=&device=&game=&online=&page=`; `GET /api/players/:id`; `PATCH /api/players/me`
+- `GET/POST /api/squads`; `GET /api/squads/:id`; `POST /api/squads/:id/join` submits a leader-reviewed request; `/invites`, `/analyze`
+- `GET /api/notifications`; `PATCH /api/join-requests/:id` accepts or rejects a pending request; `POST /api/invites/:id/reject`
+- `POST /api/invites/:code/accept`; `POST /api/ai/bio`
+- `GET /api/conversations`; `GET /api/messages?receiverId=...` or `?squadId=...`, optional `before` cursor (50 messages per page)
+- `GET /api/capabilities`; `POST /api/uploads/local` (multipart field `image`); `GET /api/uploads/content/:id` (message ID, authenticated)
+- `POST /api/uploads/presign` (S3 mode); `GET /api/uploads/view?messageId=...`
+- `GET /api/health`
+
+Socket events: `join_room`, `leave_room`, `send_message`, `typing`, `update_status`, `read_messages`, with acknowledgement objects. Server events: `message`, `message_notification`, `typing`, `presence`, `read_receipt`, `inbox_updated`. Direct rooms sort UUIDs; squad rooms require active membership. Messages are persisted before emission. Validation and per-socket throttling apply. Redis supports multiple Socket.io instances; use sticky routing when retaining HTTP long polling.
+
+Matching: 40% role, 30% schedule (Jaccard intersection/union), 20% rank, 10% age. Age deducts ten points per year beyond a four-year gap. Rank order is Bronze → Silver → Gold → Platinum → Diamond → Heroic → Master → Grandmaster. Stats are self-reported; verification is server-controlled.
+
+## Production deployment
+
+Build the container with `docker build -t squadup .`. It serves both the SPA and API on port 4000; use `CLIENT_ORIGIN=https://your-domain` with HTTPS termination. Client API defaults to `/api` in the container; Socket.io defaults to same origin. Inject environment secrets at runtime, never in the image or client bundle. Run migrations as a separate release step before starting the application. For local image storage, mount persistent storage at `/app/.local/uploads`, writable by the container's `node` user; images otherwise disappear when the container is replaced. `.dockerignore` excludes local databases, backups, env files and uploads from the build context. Container deployment itself has not been verified in this release.
+
+See `deploy/AWS.md` for EC2/ECS, RDS, S3, Redis, CloudFront, DNS, and launch requirements. No cloud resources have been provisioned. Sub-second chat depends on network and moderation latency; it is **not benchmarked or guaranteed**. This is an implementation ready for review and deployment configuration, not a certification of production readiness.
+
+## Remaining launch work
+
+- Provision and verify public hosting, production credentials, monitoring, HTTPS and off-machine disaster recovery. Optional AWS, SMS, S3, OpenAI and Redis adapters still need external verification. Benchmark Socket.io across intended Indian regions and test moderation behavior in the supported languages.
+- Extend image byte inspection to the optional S3 flow and add abandoned-upload cleanup. Local screenshots already verify actual bytes, decode dimensions and re-encode WebP.
+- Add refresh-token revocation if immediate logout across devices is required; existing issued JWTs expire after twelve hours.
+- Add account recovery, block/report tools, leader roster editing, and persistent per-recipient group read receipts if needed. Open-squad join requests now require leader approval; targeted invitations can be accepted or rejected from Notifications.
+- Review legal/privacy requirements and third-party image licensing for a public launch. Replace sample avatar URLs with uploaded assets.
+- React Router was upgraded to 7.18.4 with the user's approval. `npm audit` reported zero known vulnerabilities on October 13, 2026; keep reviewing dependency updates.
+
+## Implementation references
+
+The AI integration follows the official [GPT-4o-mini model documentation](https://developers.openai.com/api/docs/models/gpt-4o-mini) and [moderation API reference](https://developers.openai.com/api/reference/typescript/resources/moderations/methods/create). Styling uses the official [Tailwind v4 Vite integration](https://tailwindcss.com/docs/installation/using-vite).

@@ -6,4 +6,6 @@ dist/
 *.log
 coverage/
 artifacts/
+.local/
+publish/
 .DS_Store
