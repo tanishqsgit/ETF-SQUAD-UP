@@ -1,3 +1,5 @@
+> **New contributor?** Read the [setup and review guide](docs/reader-guide.md) to distinguish the browser demo, full-stack setup, and production-readiness checks.
+
 # SquadUp — Esports Team Finder
 
 Mobile-first React 18 / Vite / Tailwind v4 PWA with Express, Sequelize PostgreSQL, authenticated Socket.io chat, Redis adapter, S3 uploads, and OpenAI services. Dark and light themes, player discovery, weighted matching, four-step registration, player profiles, squad creation, five-slot rosters, seven-day invites, squad analysis, and direct/squad chat are implemented.
